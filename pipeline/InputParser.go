@@ -2,40 +2,37 @@ package pipeline
 
 import (
 	"bufio"
-	"errors"
-	"os"
+	"io"
 	"strconv"
 	"strings"
 )
 
-var ErrInvalidInput = errors.New("invalid input")
-
+// InputParser handles parsing of raw string input into integers
 type InputParser struct{}
 
+// NewInputParser creates a new InputParser instance
 func NewInputParser() *InputParser {
 	return &InputParser{}
 }
 
-// Parse μετατρέπει raw string σε int, αγνοεί whitespace/newline
+// Parse converts a raw string to an integer after trimming whitespace
 func (p *InputParser) Parse(raw string) (int, error) {
+	// Remove leading and trailing whitespace
 	raw = strings.TrimSpace(raw)
-	if raw == "" {
-		return 0, ErrInvalidInput
-	}
-	n, err := strconv.Atoi(raw)
-	if err != nil {
-		return 0, ErrInvalidInput
-	}
-	return n, nil
+	// Convert string to integer
+	return strconv.Atoi(raw)
 }
 
-// readInput διαβάζει μια γραμμή από stdin και την parse-άρει
-func readInput() (int, error) {
-	reader := bufio.NewReader(os.Stdin)
+// ReadInputFrom reads from any io.Reader (for mock stdin in tests)
+func ReadInputFrom(r io.Reader) (int, error) {
+	// Create a buffered reader for efficient reading
+	reader := bufio.NewReader(r)
+	// Read until newline character
 	line, err := reader.ReadString('\n')
 	if err != nil {
 		return 0, err
 	}
+	// Create parser and parse the line
 	parser := NewInputParser()
 	return parser.Parse(line)
 }
